@@ -1,0 +1,33 @@
+{
+  "name": "node-docker-mongo-app",
+  "version": "1.0.0",
+  "description": "A simple Node.js application using Docker and MongoDB",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node dist/app.js",
+    "build": "tsup src",
+    "dev": "tsx watch src/app.ts"
+  },
+  "dependencies": {
+    "@mendable/firecrawl-js": "^1.24.0",
+    "axios": "^1.8.4",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^5.13.23",
+    "openai": "^4.93.0",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.27.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.13.17",
+    "@types/qrcode-terminal": "^0.12.2",
+    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.4.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "author": "",
+  "license": "ISC"
+}
