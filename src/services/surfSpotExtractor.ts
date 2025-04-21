@@ -5,9 +5,17 @@ export interface ExtractedLocation {
   city: string;
 }
 
+const throwErrorMessage = () => {
+  console.error('Error: No spot or city found');
+
+  throw new Error(
+    'Não encontramos o pico mencionado na sua mensagem. Por favor, revise a mensagem e adicione o nome do pico e a cidade.',
+  );
+};
+
 export async function extractSurfSpot(
   userMessage: string,
-): Promise<ExtractedLocation | false> {
+): Promise<ExtractedLocation> {
   try {
     const response = await openAiAPI(GPTModel.GPT4o_MINI, [
       {
@@ -23,16 +31,19 @@ export async function extractSurfSpot(
     ]);
 
     const extractedText = response.choices[0]?.message?.content;
+
     if (!extractedText) {
-      console.error('extractSurfSpot => No content in the response');
-      return false;
+      return throwErrorMessage();
     }
 
     const [spot, city] = extractedText.split(',').map((s) => s.trim());
 
-    return spot && city ? { spot, city } : false;
+    if (!spot || !city) {
+      return throwErrorMessage();
+    }
+
+    return { spot, city };
   } catch (error) {
-    console.error('extractSurfSpot => Error extracting surf spot:', error);
-    return false;
+    return throwErrorMessage();
   }
 }
