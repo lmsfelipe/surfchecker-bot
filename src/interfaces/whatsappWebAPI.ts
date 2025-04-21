@@ -17,7 +17,14 @@ export function initWhatsapp() {
   });
 
   client.on('message', async (msg) => {
-    const response = await whatsappHandler.getSurfForecast(msg);
+    const contact = await msg.getContact();
+    const senderName = contact.pushname || contact.verifiedName;
+
+    console.log(`Message received from: ${senderName}`);
+    const response = await whatsappHandler.getSurfForecast(
+      msg.body,
+      senderName,
+    );
     msg.reply(response);
 
     // if (msg.body == '!ping') {
