@@ -27,10 +27,11 @@ mongoose
     });
 
     // Initialize WhatsApp client
-    // initWhatsapp();
+    initWhatsapp();
   })
   .catch((err) => console.error('MongoDB connection error:', err));
 
 // Set up routes
 // app.post('/users', indexController.createUser);
 // app.get('/users', indexController.getUsers);
+app.post('/surf-forecast', indexController.getSurfForecast);
