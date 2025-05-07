@@ -10,9 +10,9 @@ const throwErrorMessage = () => {
 
 export async function serperAPI(
   message: string,
-): Promise<{ domain: string; url: string; tagToScrape: string[] }[]> {
+): Promise<{ domain: string; url: string; tagToScrape: string[] }> {
   const data = JSON.stringify({
-    q: message,
+    q: `${message} previsão de surf`,
     gl: 'br',
   });
 
@@ -33,42 +33,27 @@ export async function serperAPI(
       return throwErrorMessage();
     }
 
-    const findResultByDomain = (domain: string) => {
-      return response.data.organic.find(
-        (item: any) =>
-          typeof item.link === 'string' && item.link.includes(domain),
-      );
-    };
-
-    const surfguruResult = findResultByDomain('surfguru');
-    const wavesResult = findResultByDomain('waves');
-
-    if (!surfguruResult && !wavesResult) {
-      return throwErrorMessage();
+    // Find the first matching domain in order of appearance
+    for (const result of response.data.organic) {
+      if (typeof result.link === 'string') {
+        if (result.link.includes('surfguru')) {
+          return {
+            domain: 'surfguru',
+            url: `${result.link}?tipo=tabela`,
+            tagToScrape: ['#diario_semana'],
+          };
+        }
+        if (result.link.includes('waves')) {
+          return {
+            domain: 'waves',
+            url: result.link,
+            tagToScrape: ['#forecast-table'],
+          };
+        }
+      }
     }
 
-    const surfForescastSitesResults = [
-      ...(surfguruResult?.link
-        ? [
-            {
-              domain: 'surfguru',
-              url: `${surfguruResult.link}?tipo=tabela`,
-              tagToScrape: ['#diario_semana'],
-            },
-          ]
-        : []),
-      ...(wavesResult?.link
-        ? [
-            {
-              domain: 'waves',
-              url: wavesResult.link,
-              tagToScrape: ['#forecast-table'],
-            },
-          ]
-        : []),
-    ];
-
-    return surfForescastSitesResults;
+    return throwErrorMessage();
   } catch (error) {
     console.error('Error fetching data from Serper API:', error);
     return throwErrorMessage();
