@@ -1,16 +1,16 @@
 import { openAiAPI, GPTModel } from '../interfaces/openAiAPI';
+import { getWeekDays } from '../utils/dateFormatter';
 
-// Define o contexto para o prompt
 const context = `
 Você está analisando um conjunto de dados de condições de surfe para diferentes horários do dia.
 Cada parte do dado está separada por um identificador de tempo (por exemplo, "3h", "6h", etc.)
 inclui dados sobre ondas, swell, vento, clima e energia das ondas. Aqui está a estrutura dos dados:
 
-1. **Condições do Surfe**: altura da onda (m), altura total da onda (m), período da onda (s), direção do swell (°).
-2. **Condições do Swell**: altura do swell (m), período do swell (s), direção do swell (°).
-3. **Condições do Vento**: velocidade do vento (km/h), rajadas do vento (km/h), direção do vento (°), velocidade do vento marítimo (km/h), direção do vento marítimo (°).
-4. **Condições Climáticas**: temperatura do ar (°C), cobertura de nuvens (%), CAPE, pressão atmosférica (hPa).
-5. **Energia e Potência das Ondas**: energia das ondas (J/m²), potência das ondas (W/m²).
+1. Condições do Surfe: altura da onda (m), altura total da onda (m), período da onda (s), direção do swell (°).
+2. Condições do Swell: altura do swell (m), período do swell (s), direção do swell (°).
+3. Condições do Vento: velocidade do vento (km/h), rajadas do vento (km/h), direção do vento (°), velocidade do vento marítimo (km/h), direção do vento marítimo (°).
+4. Condições Climáticas: temperatura do ar (°C), cobertura de nuvens (%), CAPE, pressão atmosférica (hPa).
+5. Energia e Potência das Ondas: energia das ondas (J/m²), potência das ondas (W/m²).
 
 Aqui estão os dados de exemplo para análise:
 6h0.7 m0.6 m12 sS (171°) 6h6h0.6 m12 sS (171°) 6h6h4 km/h 4 km/h NE (52°) 4 km/h ENE 6h24 °C 56% 500 1016 6h2282.2
@@ -21,12 +21,23 @@ A análise deve ser feita em linguagem informal e voltada para o público de sur
 Os dados devem ser separados por seções, onde cada seção deve ser um dia da semana.
 Antes de iniciar as seções detalhadas por data, forneça um resumo geral indicando os melhores dias para surfar, com base nas condições do swell, vento e clima.
 Não inclua a data de ontem, apenas a data de hoje e os próximos dias.
-A mensagem deve ser formatada para envio via whatsapp.
+A mensagem deve ser formatada para envio via whatsapp, com os seguintes símbolos:
+* para negrito
+_ para itálico
+- para listas
+Exemplo de formatação:
+*Resumo Geral:*
+_Condições de Surfe:_
+- Altura da Onda: 0.7 m
+- Altura Total da Onda: 0.6 m 
+
+Não utilizar formatações HTML ou Markdown, apenas a formatação para whatsapp.
 `;
 
 export async function surfForecastBuilder(
   content: string,
   senderName: string | undefined,
+  message: string,
 ): Promise<string> {
   try {
     const response = await openAiAPI(GPTModel.GPT4o, [
@@ -42,6 +53,14 @@ export async function surfForecastBuilder(
       {
         role: 'user',
         content,
+      },
+      {
+        role: 'user',
+        content: `
+            Baseando-se na mensagem do usuário "${message}", forneça uma análise detalhada das condições de surfe com base nos dados fornecidos.
+            Tabela de datas desta semana:
+            ${getWeekDays()}
+          `,
       },
       ...(senderName
         ? [
