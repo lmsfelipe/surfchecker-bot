@@ -11,7 +11,7 @@ services:
       - ./src:/app/src
       - ./.wwebjs_auth:/app/.wwebjs_auth
     ports:
-      - '8000:8080'
+      - '9000:9080'
     environment:
       - MONGO_URI=mongodb://mongo:27017/surfchecker
       - OPENAI_API_KEY=${OPENAI_API_KEY}

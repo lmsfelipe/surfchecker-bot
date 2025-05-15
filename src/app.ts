@@ -7,12 +7,13 @@ import { initWhatsapp } from './interfaces/whatsappWebAPI';
 dotenv.config();
 
 const app: Application = express();
-const PORT: number = parseInt(process.env.PORT || '8080', 10);
+const PORT: number = parseInt(process.env.PORT || '9080', 10);
 const MONGODB_URI: string =
   process.env.MONGODB_URI || 'mongodb://mongo:27017/surfchecker';
 
 // Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // MongoDB connection
 mongoose
@@ -27,7 +28,7 @@ mongoose
     });
 
     // Initialize WhatsApp client
-    initWhatsapp();
+    // initWhatsapp();
   })
   .catch((err) => console.error('MongoDB connection error:', err));
 
@@ -35,3 +36,4 @@ mongoose
 // app.post('/users', indexController.createUser);
 // app.get('/users', indexController.getUsers);
 app.post('/surf-forecast', indexController.getSurfForecast);
+app.post('/webhook', indexController.webhook);

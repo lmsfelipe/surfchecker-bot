@@ -34,6 +34,6 @@ RUN npm run build \
 # Switch to non-root user
 USER pptruser
 
-EXPOSE 8080
+EXPOSE 9080
 
 CMD ["npm", "run", "dev"]
