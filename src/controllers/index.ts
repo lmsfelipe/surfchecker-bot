@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { UserModel } from '../models/user';
 import { User } from '../entities/User';
-import { WhatsappHandler } from '../services/WhatsappHandler';
+import { MessengerHandler } from '../services/MessengerHandler';
 import { extractSurfSpot } from '../services/surfSpotExtractor';
 
 export const indexController = {
@@ -42,7 +42,7 @@ export const indexController = {
   async getSurfForecast(req: Request, res: Response): Promise<Response> {
     const { message, name, phoneNumber } = req.body;
 
-    const whatsappHandler = new WhatsappHandler({
+    const messengerHandler = new MessengerHandler({
       message,
       phoneNumber,
       senderName: name,
@@ -55,7 +55,7 @@ export const indexController = {
     }
 
     try {
-      const surfForecast = await whatsappHandler.getSurfForecast();
+      const surfForecast = await messengerHandler.getSurfForecast();
 
       return res.status(200).json({ message: surfForecast });
     } catch (error) {

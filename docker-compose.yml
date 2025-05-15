@@ -9,7 +9,6 @@ services:
     container_name: surfchecker-api
     volumes:
       - ./src:/app/src
-      - ./.wwebjs_auth:/app/.wwebjs_auth
     ports:
       - '9000:9080'
     environment:

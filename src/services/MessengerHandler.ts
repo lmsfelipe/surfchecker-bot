@@ -11,7 +11,7 @@ interface MessageInfo {
   message: string;
 }
 
-export class WhatsappHandler {
+export class MessengerHandler {
   constructor(private readonly messageInfo: MessageInfo) {}
 
   async getSurfForecast(): Promise<string> {

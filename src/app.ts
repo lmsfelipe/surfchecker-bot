@@ -2,7 +2,6 @@ import express, { Application } from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { indexController } from './controllers/index';
-import { initWhatsapp } from './interfaces/whatsappWebAPI';
 
 dotenv.config();
 
@@ -20,20 +19,17 @@ mongoose
   .connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log('=========== MongoDB connected ===========');
-
     app.listen(PORT, () => {
       console.log(
         `>>>>>>>>>>>>> Server is running on port ${PORT} <<<<<<<<<<<<`,
       );
     });
-
-    // Initialize WhatsApp client
-    // initWhatsapp();
   })
   .catch((err) => console.error('MongoDB connection error:', err));
 
 // Set up routes
-// app.post('/users', indexController.createUser);
-// app.get('/users', indexController.getUsers);
+
+// @ts-ignore
 app.post('/surf-forecast', indexController.getSurfForecast);
+// @ts-ignore
 app.post('/webhook', indexController.webhook);

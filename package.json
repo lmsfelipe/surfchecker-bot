@@ -14,14 +14,11 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "mongoose": "^5.13.23",
-    "openai": "^4.93.0",
-    "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.27.0"
+    "openai": "^4.93.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.1",
     "@types/node": "^22.13.17",
-    "@types/qrcode-terminal": "^0.12.2",
     "nodemon": "^2.0.22",
     "ts-node": "^10.9.2",
     "tsup": "^8.4.0",
