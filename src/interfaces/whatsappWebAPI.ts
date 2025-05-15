@@ -4,7 +4,6 @@ import { WhatsappHandler } from '../services/WhatsappHandler';
 
 export function initWhatsapp() {
   const client = new Client({});
-  const whatsappHandler = new WhatsappHandler();
 
   client.on('qr', (qr) => {
     // Generate and scan this code with your phone
@@ -18,18 +17,16 @@ export function initWhatsapp() {
 
   client.on('message', async (msg) => {
     const contact = await msg.getContact();
-    const senderName = contact.pushname || contact.verifiedName;
 
-    console.log(`Message received from: ${senderName}`);
-    const response = await whatsappHandler.getSurfForecast(
-      msg.body,
-      senderName,
-    );
+    const whatsappHandler = new WhatsappHandler({
+      phoneNumber: contact.number,
+      senderName: contact.pushname || contact.verifiedName,
+      message: msg.body,
+    });
+
+    const response = await whatsappHandler.getSurfForecast();
+    await whatsappHandler.storeRequest(response);
     msg.reply(response);
-
-    // if (msg.body == '!ping') {
-    //   msg.reply('pong');
-    // }
   });
 
   client.initialize();
