@@ -21,16 +21,22 @@ const UserSchema: Schema = new Schema(
     allowedRequests: {
       type: Number,
       required: false,
-      default: 0,
+      default: 5,
     },
     favoriteSpot: {
       type: String,
       required: false,
     },
+    forecasts: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Forecast',
+      },
+    ],
   },
   {
     timestamps: true,
-    _id: true, // Ensure MongoDB generates the _id
+    _id: true,
   },
 );
 
