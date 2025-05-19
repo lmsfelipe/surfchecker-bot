@@ -25,6 +25,7 @@ export class MessengerHandler {
         spotURL.url,
         spotURL.tagToScrape,
       );
+
       console.log('contentScraped ===>', contentScraped);
 
       const surfForecast = await surfForecastBuilder(
@@ -52,16 +53,22 @@ export class MessengerHandler {
       throw new Error('Phone number is required to store forecast');
     }
 
+    let spot = '',
+      city = '',
+      state = '';
+
     // extract the spot, city and state from the message using the surfSpotExtractor
     const response = await extractSurfSpot(this.messageInfo.message);
 
-    if (response === false) {
-      throw new Error('Failed to extract surf spot information.');
+    if (response !== false) {
+      spot = response.spot;
+      city = response.city;
+      state = response.state;
+    } else {
+      console.log(
+        'Failed to extract surf spot information, continuing with empty values',
+      );
     }
-
-    const { spot, city, state } = response;
-
-    console.log('spot ===>', spot, 'city ===>', city, 'state ===>', state);
 
     const forecast = new Forecast({
       response: forecastMessage,

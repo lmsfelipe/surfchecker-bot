@@ -1,44 +1,10 @@
 import { Request, Response } from 'express';
-import { UserModel } from '../models/user';
-import { User } from '../entities/User';
 import { MessengerHandler } from '../services/MessengerHandler';
 import { extractSurfSpot } from '../services/surfSpotExtractor';
+import { evolutionApiService } from '../interfaces/evolutionApi';
+import { randomWaitingMessage } from '../utils/randomWaitingMessage';
 
 export const indexController = {
-  async createUser(req: Request, res: Response) {
-    const { name, phoneNumber } = req.body;
-
-    if (!name || !phoneNumber) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    const userData = new User({ name, phoneNumber });
-    console.log('userData ===>', userData.data);
-
-    try {
-      const user = new UserModel(userData.data);
-      console.log('userModel ===>', user);
-
-      await user.save();
-
-      return res.status(201).json(user);
-    } catch (error) {
-      return res.status(500).json({
-        error: 'Error creating user',
-        message: error instanceof Error ? error.message : String(error),
-      });
-    }
-  },
-
-  async getUsers(req: Request, res: Response) {
-    try {
-      const users = await UserModel.find();
-      return res.status(200).json(users);
-    } catch (error) {
-      return res.status(500).json({ error: 'Error retrieving users' });
-    }
-  },
-
   async getSurfForecast(req: Request, res: Response): Promise<Response> {
     const { message, name, phoneNumber } = req.body;
 
@@ -83,36 +49,76 @@ export const indexController = {
     }
   },
 
-  // create a webhook endpoint to receive messages from whatsapp
-  async webhook(req: Request, res: Response): Promise<Response> {
+  async webhook(req: Request, res: Response) {
     console.log('Evolution API Webhook:', req.body);
 
-    // Check if it's a message event
-    if (!req.body) {
+    const messageData = req.body?.data;
+    const message = messageData?.message?.conversation;
+
+    if (!message) {
       return res
-        .status(200)
-        .json({ status: 'ignored', message: 'Not a message event' });
+        .status(400)
+        .json({ error: 'Message is required in the request body' });
     }
 
-    return res.status(200).json({
-      status: 'success',
-      message: 'Webhook received successfully',
+    const phoneNumber = messageData.key.remoteJid.split('@')[0];
+    const senderName = messageData.pushName || '';
+
+    const messengerHandler = new MessengerHandler({
+      message,
+      phoneNumber,
+      senderName,
     });
 
-    // const message = req.body.body?.message;
-    // const senderNumber = req.body.from;
-    // const senderName = req.body.pushName;
+    try {
+      const waitingMessage = randomWaitingMessage();
 
-    // if (!message || !senderNumber) {
-    //   return res.status(400).json({
-    //     error: 'Missing required fields in webhook payload',
-    //   });
-    // }
+      await evolutionApiService.sendTextMessage({
+        number: phoneNumber,
+        text: waitingMessage,
+      });
 
-    // return res.status(200).json({
-    //   status: 'success',
-    //   message: 'Webhook received successfully',
-    //   sender: senderNumber,
-    // });
+      const surfForecast = await messengerHandler.getSurfForecast();
+
+      // Send the response back via Evolution API
+      const resp = await evolutionApiService.sendTextMessage({
+        number: phoneNumber,
+        text: surfForecast,
+      });
+
+      console.log('Response from Evolution API:', resp);
+
+      return res.status(200).json({ success: true });
+    } catch (error) {
+      console.error('Error in webhook:', error);
+      return res
+        .status(500)
+        .json({ error: 'Error processing webhook request' });
+    }
+  },
+
+  async sendMessage(req: Request, res: Response): Promise<Response> {
+    const { number, text } = req.body;
+
+    if (!number || !text) {
+      return res.status(400).json({
+        error: 'Both number and text are required',
+      });
+    }
+
+    try {
+      const response = await evolutionApiService.sendTextMessage({
+        number,
+        text,
+      });
+
+      return res.status(200).json(response);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      return res.status(500).json({
+        error:
+          error instanceof Error ? error.message : 'Failed to send message',
+      });
+    }
   },
 };

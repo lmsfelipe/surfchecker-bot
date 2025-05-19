@@ -33,3 +33,5 @@ mongoose
 app.post('/surf-forecast', indexController.getSurfForecast);
 // @ts-ignore
 app.post('/webhook', indexController.webhook);
+// @ts-ignore
+app.post('/send-message', indexController.sendMessage);
