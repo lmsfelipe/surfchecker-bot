@@ -35,7 +35,7 @@ export class MessengerHandler {
       );
 
       console.log('!! Surf Forecast Completed !!');
-      this.storeRequest(surfForecast);
+      this.storeRequest(surfForecast, spotURL.url);
       return surfForecast;
     } catch (error) {
       console.log('Error in getSurfForecast:', error);
@@ -48,7 +48,7 @@ export class MessengerHandler {
     }
   }
 
-  async storeRequest(forecastMessage: string) {
+  async storeRequest(forecastMessage: string, spotURL: string) {
     if (!this.messageInfo.phoneNumber) {
       throw new Error('Phone number is required to store forecast');
     }
@@ -58,7 +58,7 @@ export class MessengerHandler {
       state = '';
 
     // extract the spot, city and state from the message using the surfSpotExtractor
-    const response = await extractSurfSpot(this.messageInfo.message);
+    const response = await extractSurfSpot(spotURL);
 
     if (response !== false) {
       spot = response.spot;

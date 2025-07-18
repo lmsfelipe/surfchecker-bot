@@ -8,17 +8,17 @@ export const indexController = {
   async getSurfForecast(req: Request, res: Response): Promise<Response> {
     const { message, name, phoneNumber } = req.body;
 
-    const messengerHandler = new MessengerHandler({
-      message,
-      phoneNumber,
-      senderName: name,
-    });
-
     if (!message || typeof message !== 'string') {
       return res
         .status(400)
         .json({ error: 'Missing or invalid required fields' });
     }
+
+    const messengerHandler = new MessengerHandler({
+      message,
+      phoneNumber,
+      senderName: name,
+    });
 
     try {
       const surfForecast = await messengerHandler.getSurfForecast();
