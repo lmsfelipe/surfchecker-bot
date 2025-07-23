@@ -2,11 +2,14 @@ version: '3.8'
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
-    container_name: surfchecker-api
+    image: ${DOCKER_REGISTRY-}surfchecker-api
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
     volumes:
       - ./src:/app/src
     ports:
@@ -22,11 +25,16 @@ services:
       - mongo
 
   mongo:
-    image: mongo
+    image: mongo:latest
     ports:
       - '27017:27017'
     volumes:
       - mongo-data:/data/db
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
 
 volumes:
   mongo-data:
+    driver: local
