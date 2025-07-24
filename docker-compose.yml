@@ -14,8 +14,6 @@ services:
       restart_policy:
         condition: on-failure
         max_attempts: 3
-    volumes:
-      - ./src:/app/src
     ports:
       - '9000:9080'
     environment:
