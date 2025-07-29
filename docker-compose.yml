@@ -2,17 +2,14 @@ version: '3.8'
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: lmsfelipe/surfcheckerapi:latest
     deploy:
       replicas: 1
-      update_config:
-        parallelism: 1
-        delay: 10s
       restart_policy:
         condition: on-failure
         max_attempts: 3
+    volumes:
+      - ./src:/app/src
     ports:
       - '9000:9080'
     environment:
