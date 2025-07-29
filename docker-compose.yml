@@ -3,6 +3,7 @@ version: '3.8'
 services:
   app:
     image: lmsfelipe/surfcheckerapi:latest
+    platform: linux/amd64 # Adding platform specification
     deploy:
       replicas: 1
       restart_policy:
@@ -24,6 +25,7 @@ services:
 
   mongo:
     image: mongo:latest
+    platform: linux/amd64 # Adding platform specification
     ports:
       - '27017:27017'
     volumes:
