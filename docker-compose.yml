@@ -9,21 +9,34 @@ services:
         condition: on-failure
         max_attempts: 3
     ports:
-      - '9000:9080'
+      - '9080:9080'
     environment:
-      - MONGO_URI=${MONGO_URI:-mongodb://mongo:27017/surfchecker}
+      - MONGO_URI=${MONGO_URI}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - SERPER_API_KEY=${SERPER_API_KEY}
       - FIRECRAWL_API_KEY=${FIRECRAWL_API_KEY}
       - EVOLUTION_API_URL=${EVOLUTION_API_URL}
       - EVOLUTION_API_KEY=${EVOLUTION_API_KEY}
+    networks:
+      - ZeekyNet ## Nome da rede interna
     depends_on:
       - mongo
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.surfchecker.rule=Host(`surfchecker-api.zeeky.com.br`)' ## Dominio do surfchecker
+      - 'traefik.http.services.surfchecker.loadbalancer.server.port=9080'
+      - 'traefik.http.routers.surfchecker.tls.certresolver=letsencryptresolver'
+      - 'traefik.http.routers.surfchecker.service=surfchecker-api'
+      - 'traefik.docker.network=ZeekyNet' ## Nome da rede interna
+      - 'traefik.http.routers.surfchecker.entrypoints=websecure'
+      - 'traefik.http.routers.surfchecker.priority=1'
 
   mongo:
     image: mongo:latest
     ports:
       - '27017:27017'
+    networks:
+      - ZeekyNet ## Nome da rede interna
     volumes:
       - mongo-data:/data/db
     deploy:
@@ -35,3 +48,9 @@ services:
 volumes:
   mongo-data:
     driver: local
+
+networks:
+  ZeekyNet: ## Nome da rede interna
+    external: true
+    attachable: true
+    name: ZeekyNet ## Nome da rede interna
