@@ -23,13 +23,14 @@ services:
       - mongo
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.surfchecker.rule=Host(`surfchecker-api.zeeky.com.br`)' ## Dominio do surfchecker
-      - 'traefik.http.services.surfchecker.loadbalancer.server.port=9080'
+      - 'traefik.http.routers.surfchecker.rule=Host(`surfchecker.zeeky.com.br`)' ## Dominio do surfchecker
       - 'traefik.http.routers.surfchecker.tls.certresolver=letsencryptresolver'
-      - 'traefik.http.routers.surfchecker.service=surfchecker-api_app'
-      - 'traefik.docker.network=ZeekyNet' ## Nome da rede interna
+      - 'traefik.http.routers.surfchecker.service=surfchecker'
       - 'traefik.http.routers.surfchecker.entrypoints=websecure'
       - 'traefik.http.routers.surfchecker.priority=1'
+      - 'traefik.http.services.surfchecker.loadbalancer.server.port=9080'
+      - 'traefik.http.services.surfchecker.loadbalancer.passHostHeader=true'
+      - 'traefik.docker.network=ZeekyNet' ## Nome da rede interna
 
   mongo:
     image: mongo:latest
