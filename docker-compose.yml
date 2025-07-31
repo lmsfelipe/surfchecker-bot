@@ -17,6 +17,7 @@ services:
       - FIRECRAWL_API_KEY=${FIRECRAWL_API_KEY}
       - EVOLUTION_API_URL=${EVOLUTION_API_URL}
       - EVOLUTION_API_KEY=${EVOLUTION_API_KEY}
+      - EVOLUTION_INSTANCE_NAME=${EVOLUTION_INSTANCE_NAME}
     networks:
       - ZeekyNet ## Nome da rede interna
     depends_on:
