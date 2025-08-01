@@ -100,6 +100,8 @@ export const indexController = {
   async sendMessage(req: Request, res: Response): Promise<Response> {
     const { number, text } = req.body;
 
+    console.log('Send Message Request:', req.body);
+
     if (!number || !text) {
       return res.status(400).json({
         error: 'Both number and text are required',
