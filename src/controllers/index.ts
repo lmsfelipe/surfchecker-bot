@@ -61,7 +61,10 @@ export const indexController = {
         .json({ error: 'Message is required in the request body' });
     }
 
-    const phoneNumber = messageData.key.remoteJid.split('@')[0];
+    const extractPhone = (id: string) => id.split('@')[0];
+    const phoneNumber = extractPhone(
+      messageData.key.senderPn || messageData.key.remoteJid,
+    );
     const senderName = messageData.pushName || '';
 
     const messengerHandler = new MessengerHandler({

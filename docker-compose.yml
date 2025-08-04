@@ -21,8 +21,6 @@ services:
       - EVOLUTION_INSTANCE_NAME=${EVOLUTION_INSTANCE_NAME}
     networks:
       - ZeekyNet
-    depends_on:
-      - mongo
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.surfchecker.rule=Host(`surfchecker.zeeky.com.br`)'
@@ -33,23 +31,6 @@ services:
       - 'traefik.http.services.surfchecker.loadbalancer.server.port=9080'
       - 'traefik.http.services.surfchecker.loadbalancer.passHostHeader=true'
       - 'traefik.docker.network=ZeekyNet'
-
-  mongo:
-    image: mongo:latest
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-        max_attempts: 3
-    networks:
-      - ZeekyNet
-    volumes:
-      - mongo-data:/data/db
-
-volumes:
-  mongo-data:
-    driver: local
-
 networks:
   ZeekyNet:
     external: true

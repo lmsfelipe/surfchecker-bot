@@ -4,10 +4,11 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
       - '9080:9080'
     environment:
+      - NODE_ENV=development
       - MONGO_URI=mongodb://mongo:27017/surfchecker
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - SERPER_API_KEY=${SERPER_API_KEY}
@@ -20,6 +21,7 @@ services:
       - /usr/src/app/node_modules
     depends_on:
       - mongo
+    restart: unless-stopped
 
   mongo:
     image: mongo:latest
