@@ -9,7 +9,7 @@ services:
       - '9080:9080'
     environment:
       - NODE_ENV=development
-      - MONGO_URI=mongodb://mongo:27017/surfchecker
+      - MONGODB_URI=${MONGODB_URI}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - SERPER_API_KEY=${SERPER_API_KEY}
       - FIRECRAWL_API_KEY=${FIRECRAWL_API_KEY}
