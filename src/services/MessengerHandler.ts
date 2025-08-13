@@ -49,29 +49,9 @@ export class MessengerHandler {
       throw new Error('Phone number is required to store forecast');
     }
 
-    let spot = '',
-      city = '',
-      state = '';
-
-    // extract the spot, city and state from the message using the surfSpotExtractor
-    const response = await extractSurfSpot(forecastMessage);
-
-    if (response !== false) {
-      spot = response.spot;
-      city = response.city;
-      state = response.state;
-    } else {
-      console.log(
-        'Failed to extract surf spot information, continuing with empty values',
-      );
-    }
-
     const forecast = new Forecast({
       response: forecastMessage,
       senderMessage: this.messageInfo.message,
-      city,
-      state,
-      spot,
     });
 
     const savedForecast = await forecast.save();
