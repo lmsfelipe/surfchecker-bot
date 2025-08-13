@@ -3,6 +3,8 @@ import { MessengerHandler } from '../services/MessengerHandler';
 import { extractSurfSpot } from '../services/surfSpotExtractor';
 import { evolutionApiService } from '../interfaces/evolutionApi';
 import { randomWaitingMessage } from '../utils/randomWaitingMessage';
+import { GPTModel, Message, openAiAPI } from '../interfaces/openAiAPI';
+import { geminiAPI } from '../interfaces/geminiAPI';
 
 export const indexController = {
   async getSurfForecast(req: Request, res: Response): Promise<Response> {
@@ -29,6 +31,65 @@ export const indexController = {
     }
   },
 
+  // create a controller to get a message from body and call open AI service
+  async getOpenAiResponse(req: Request, res: Response): Promise<Response> {
+    const { message } = req.body;
+
+    if (!message || typeof message !== 'string') {
+      return res.status(400).json({
+        error: 'Message is required and must be a string',
+      });
+    }
+
+    const modelMessage: Message[] = [
+      {
+        role: 'user',
+        content: message,
+      },
+    ];
+
+    try {
+      console.time('OpenAI API Call');
+      const response = await openAiAPI(
+        GPTModel.GPT4o_SEARCH_PREVIEW,
+        modelMessage,
+      );
+      console.timeEnd('OpenAI API Call');
+      return res.status(200).json(response);
+    } catch (error) {
+      return res.status(500).json({
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Error getting OpenAI response',
+      });
+    }
+  },
+
+  async getGeminiAiResponse(req: Request, res: Response): Promise<Response> {
+    const { message } = req.body;
+
+    if (!message || typeof message !== 'string') {
+      return res.status(400).json({
+        error: 'Message is required and must be a string',
+      });
+    }
+
+    try {
+      console.time('============ Gemini API Call ============');
+      const response = await geminiAPI(message);
+      console.timeEnd('============ Gemini API Call ============');
+      return res.status(200).json(response);
+    } catch (error) {
+      return res.status(500).json({
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Error getting Gemini response',
+      });
+    }
+  },
+
   async extractLocation(req: Request, res: Response): Promise<Response> {
     const { message } = req.body;
 
@@ -51,6 +112,7 @@ export const indexController = {
 
   async webhook(req: Request, res: Response) {
     console.log('Evolution API Webhook:', req.body);
+    console.time('>>>>>>>>>>>>>Surf forecast Call<<<<<<<<<<<<<<<');
 
     const messageData = req.body?.data;
     const message = messageData?.message?.conversation;
@@ -90,7 +152,7 @@ export const indexController = {
       });
 
       console.log('Response from Evolution API:', resp);
-
+      console.timeEnd('>>>>>>>>>>>>>Surf forecast Call<<<<<<<<<<<<<<<');
       return res.status(200).json({ success: true });
     } catch (error) {
       console.error('Error in webhook:', error);

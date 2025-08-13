@@ -18,7 +18,7 @@ export async function extractSurfSpot(
   userMessage: string,
 ): Promise<ExtractedLocation | false> {
   try {
-    const response = await openAiAPI(GPTModel.GPT4o, [
+    const response = await openAiAPI(GPTModel.GPT4o_MINI, [
       {
         role: 'system',
         content: `Você é um assistente que extrai o pico de surf, cidade e estado de uma mensagem do usuário.`,

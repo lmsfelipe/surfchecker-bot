@@ -7,15 +7,8 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - '9080:9080'
-    environment:
-      - NODE_ENV=development
-      - MONGODB_URI=${MONGODB_URI}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - SERPER_API_KEY=${SERPER_API_KEY}
-      - FIRECRAWL_API_KEY=${FIRECRAWL_API_KEY}
-      - EVOLUTION_API_URL=${EVOLUTION_API_URL}
-      - EVOLUTION_API_KEY=${EVOLUTION_API_KEY}
-      - EVOLUTION_INSTANCE_NAME=${EVOLUTION_INSTANCE_NAME}
+    env_file:
+      - .env
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules

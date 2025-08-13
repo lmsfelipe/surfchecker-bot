@@ -4,6 +4,7 @@ import { surfForecastBuilder } from './surfForecastBuilder';
 import { extractSurfSpot } from './surfSpotExtractor';
 import { Forecast } from '../models/forecast';
 import { UserModel } from '../models/user.js';
+import { geminiAPI } from '../interfaces/geminiAPI';
 
 interface MessageInfo {
   phoneNumber?: string;
@@ -18,25 +19,19 @@ export class MessengerHandler {
     try {
       console.log('ws message ===>', this.messageInfo.message);
 
-      const spotURL = await serperAPI(this.messageInfo.message);
-      console.log('spotURL ===>', spotURL);
-
-      const contentScraped = await firecrawlAPI(
-        spotURL.url,
-        spotURL.tagToScrape,
+      const geminiResponse = await geminiAPI(
+        `mensagem: ${this.messageInfo.message} pessoa: ${this.messageInfo.senderName}`,
       );
 
-      console.log('contentScraped ===>', contentScraped);
+      if (!geminiResponse) {
+        throw new Error('No response from Gemini API');
+      }
 
-      const surfForecast = await surfForecastBuilder(
-        contentScraped,
-        this.messageInfo.senderName,
-        this.messageInfo.message,
-      );
+      console.log('Gemini Response:', geminiResponse);
 
       console.log('!! Surf Forecast Completed !!');
-      this.storeRequest(surfForecast, spotURL.url);
-      return surfForecast;
+      this.storeRequest(geminiResponse);
+      return geminiResponse;
     } catch (error) {
       console.log('Error in getSurfForecast:', error);
 
@@ -48,7 +43,8 @@ export class MessengerHandler {
     }
   }
 
-  async storeRequest(forecastMessage: string, spotURL: string) {
+  async storeRequest(forecastMessage: string) {
+    console.log('Storing forecast message...');
     if (!this.messageInfo.phoneNumber) {
       throw new Error('Phone number is required to store forecast');
     }
@@ -58,7 +54,7 @@ export class MessengerHandler {
       state = '';
 
     // extract the spot, city and state from the message using the surfSpotExtractor
-    const response = await extractSurfSpot(spotURL);
+    const response = await extractSurfSpot(forecastMessage);
 
     if (response !== false) {
       spot = response.spot;

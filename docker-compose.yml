@@ -19,6 +19,7 @@ services:
       - EVOLUTION_API_URL=${EVOLUTION_API_URL}
       - EVOLUTION_API_KEY=${EVOLUTION_API_KEY}
       - EVOLUTION_INSTANCE_NAME=${EVOLUTION_INSTANCE_NAME}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     networks:
       - ZeekyNet
     labels:
