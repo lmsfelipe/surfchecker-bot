@@ -3,7 +3,7 @@ export interface IUser {
   phoneNumber: string;
   allowedRequests?: number;
   favoriteSpot?: string;
-  forecasts?: string[];
+  messages?: string[];
 }
 
 export class User {

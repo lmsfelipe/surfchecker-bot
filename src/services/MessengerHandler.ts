@@ -1,8 +1,4 @@
-import { serperAPI } from '../interfaces/serperApi';
-import { firecrawlAPI } from '../interfaces/firecrawlApi';
-import { surfForecastBuilder } from './surfForecastBuilder';
-import { extractSurfSpot } from './surfSpotExtractor';
-import { Forecast } from '../models/forecast';
+import { Message } from '../models/message';
 import { UserModel } from '../models/user.js';
 import { geminiAPI } from '../interfaces/geminiAPI';
 
@@ -49,7 +45,7 @@ export class MessengerHandler {
       throw new Error('Phone number is required to store forecast');
     }
 
-    const forecast = new Forecast({
+    const forecast = new Message({
       response: forecastMessage,
       senderMessage: this.messageInfo.message,
     });
@@ -66,7 +62,7 @@ export class MessengerHandler {
       // Update existing user
       const currentAllowedRequests = user.allowedRequests ?? 5;
 
-      user.forecasts?.push(forecastId);
+      user.messages?.push(forecastId);
       user.allowedRequests = currentAllowedRequests - 1;
       await user.save();
       console.log('User found and forecast saved successfully.');
@@ -76,7 +72,7 @@ export class MessengerHandler {
         name: this.messageInfo.senderName || 'Unknown',
         phoneNumber: this.messageInfo.phoneNumber,
         allowedRequests: 4, // Start with 4 since we're using one request now
-        forecasts: [forecastId],
+        messages: [forecastId],
       });
 
       await user.save();

@@ -23,14 +23,10 @@ const UserSchema: Schema = new Schema(
       required: false,
       default: 5,
     },
-    favoriteSpot: {
-      type: String,
-      required: false,
-    },
-    forecasts: [
+    messages: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'Forecast',
+        ref: 'Message',
       },
     ],
   },
