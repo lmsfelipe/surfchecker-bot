@@ -118,6 +118,8 @@ export const indexController = {
     const message = messageData?.message?.conversation;
 
     if (!message) {
+      console.time('>>>>>>>>>>>>>Surf forecast Call<<<<<<<<<<<<<<<');
+      console.error('Message is required in the request body');
       return res
         .status(400)
         .json({ error: 'Message is required in the request body' });

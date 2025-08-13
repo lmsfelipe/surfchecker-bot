@@ -3,7 +3,7 @@ import { UserModel } from '../models/user.js';
 import { geminiAPI } from '../interfaces/geminiAPI';
 
 interface MessageInfo {
-  phoneNumber?: string;
+  phoneNumber: string;
   senderName?: string;
   message: string;
 }
@@ -11,8 +11,27 @@ interface MessageInfo {
 export class MessengerHandler {
   constructor(private readonly messageInfo: MessageInfo) {}
 
+  private async validateRequest(): Promise<string | null> {
+    if (this.messageInfo.message.length < 15) {
+      return 'Message is too short. Please provide more details about the surf spot.';
+    }
+
+    const user = await UserModel.findOne({
+      phoneNumber: this.messageInfo.phoneNumber,
+    });
+
+    if (user && (user.allowedRequests ?? 0) <= 0) {
+      return 'No request allowed';
+    }
+
+    return null;
+  }
+
   async getSurfForecast(): Promise<string> {
     try {
+      // const validationError = await this.validateRequest();
+      // if (validationError) return validationError;
+
       console.log('ws message ===>', this.messageInfo.message);
 
       const geminiResponse = await geminiAPI(
@@ -23,9 +42,8 @@ export class MessengerHandler {
         throw new Error('No response from Gemini API');
       }
 
-      console.log('Gemini Response:', geminiResponse);
+      console.log('!! Surf Forecast Completed !!', geminiResponse);
 
-      console.log('!! Surf Forecast Completed !!');
       this.storeRequest(geminiResponse);
       return geminiResponse;
     } catch (error) {
@@ -41,6 +59,7 @@ export class MessengerHandler {
 
   async storeRequest(forecastMessage: string) {
     console.log('Storing forecast message...');
+
     if (!this.messageInfo.phoneNumber) {
       throw new Error('Phone number is required to store forecast');
     }
