@@ -13,24 +13,25 @@ export class MessengerHandler {
 
   private async validateRequest(): Promise<string | null> {
     if (this.messageInfo.message.length < 15) {
-      return 'Message is too short. Please provide more details about the surf spot.';
+      return 'A mensagem é muito curta. Por favor, forneça mais detalhes sobre a pergunta.';
     }
 
-    const user = await UserModel.findOne({
-      phoneNumber: this.messageInfo.phoneNumber,
-    });
+    // const user = await UserModel.findOne({
+    //   phoneNumber: this.messageInfo.phoneNumber,
+    // });
 
-    if (user && (user.allowedRequests ?? 0) <= 0) {
-      return 'No request allowed';
-    }
+    // if (user && (user.allowedRequests ?? 0) <= 0) {
+    //   return 'Você atingiu o limite de máximo de 10 requisições permitidas por dia. Por favor, tente novamente amanhã.';
+    // }
 
     return null;
   }
 
   async getSurfForecast(): Promise<string> {
     try {
-      // const validationError = await this.validateRequest();
-      // if (validationError) return validationError;
+      const validationError = await this.validateRequest();
+      console.log('Validation Error:', validationError);
+      if (validationError) return validationError;
 
       console.log('ws message ===>', this.messageInfo.message);
 
